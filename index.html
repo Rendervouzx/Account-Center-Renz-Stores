@@ -96,12 +96,25 @@
       background-size: 12px;
       padding-right: 2.5rem;
     }
+    /* Status warna di dropdown & tabel */
     option.status-sale { color: #22c55e; background: #0f172a; }
     option.status-sold { color: #ef4444; background: #0f172a; }
     option.status-kendala { color: #f59e0b; background: #0f172a; }
+    option.status-wip { color: #eab308; background: #0f172a; } /* Kuning */
+    option.status-ready { color: #3b82f6; background: #0f172a; } /* Biru */
+
     option.status-sale:hover, option.status-sale:checked { background: #22c55e !important; color: white !important; }
     option.status-sold:hover, option.status-sold:checked { background: #ef4444 !important; color: white !important; }
     option.status-kendala:hover, option.status-kendala:checked { background: #f59e0b !important; color: #1e293b !important; }
+    option.status-wip:hover, option.status-wip:checked { background: #eab308 !important; color: #1e293b !important; } /* Kuning gelap untuk kontras */
+    option.status-ready:hover, option.status-ready:checked { background: #3b82f6 !important; color: white !important; }
+
+    .status-sale { color: #22c55e; font-weight: 700; }
+    .status-sold { color: #ef4444; font-weight: 700; }
+    .status-kendala { color: #f59e0b; font-weight: 700; }
+    .status-wip { color: #eab308; font-weight: 700; } /* Kuning */
+    .status-ready { color: #3b82f6; font-weight: 700; } /* Biru */
+
     .btn {
       padding: 0.9rem 1.5rem;
       font-weight: 600;
@@ -161,9 +174,6 @@
       word-break: break-all;
       color: #a5b4fc;
     }
-    .status-sale { color: #22c55e; font-weight: 700; }
-    .status-sold { color: #ef4444; font-weight: 700; }
-    .status-kendala { color: #f59e0b; font-weight: 700; }
     .actions button {
       padding: 0.5rem 1rem;
       margin-right: 0.6rem;
@@ -184,7 +194,7 @@
   <h1>Account Roblox Center</h1>
 
   <div class="search-box">
-    <input type="text" id="search" placeholder="Cari username, game, password, atau status..." oninput="filterTable()">
+    <input type="text" id="search" placeholder="Cari username, password, game, atau status..." oninput="filterTable()">
   </div>
 
   <div class="card">
@@ -208,6 +218,8 @@
             <option value="Sale" class="status-sale">Sale</option>
             <option value="Sold" class="status-sold">Sold</option>
             <option value="Kendala" class="status-kendala">Kendala</option>
+            <option value="WIP" class="status-wip">WIP</option>
+            <option value="Ready" class="status-ready">Ready</option>
           </select>
         </div>
       </div>
@@ -270,7 +282,6 @@
       console.log("Logged in as:", userId, "Is anonymous:", user.isAnonymous);
       loadAccounts();
 
-      // Sembunyikan tombol kalau sudah login permanen (tidak anonymous lagi)
       const btn = document.getElementById('googleLoginBtn');
       if (btn) {
         if (!user.isAnonymous) {
@@ -296,7 +307,6 @@
     });
   }
 
-  // Fungsi login dengan Google (langsung sign in)
   window.signInWithGoogle = function() {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
@@ -309,11 +319,9 @@
         console.error("Google sign-in error:", error.code, error.message);
         let msg = "Gagal: " + error.message;
         if (error.code === 'auth/unauthorized-domain') {
-          msg = "Domain tidak diizinkan. Buka web via http://localhost (bukan file:// langsung). Tambah 'localhost' di Authorized domains Firebase.";
+          msg = "Domain tidak diizinkan. Pastikan domain Vercel kamu sudah ditambahkan di Authorized domains Firebase.";
         } else if (error.code === 'auth/popup-blocked') {
-          msg = "Popup diblokir browser. Izinkan popup di pengaturan browser.";
-        } else if (error.code === 'auth/account-exists-with-different-credential') {
-          msg = "Akun ini sudah terdaftar dengan metode lain. Coba login dengan Google saja.";
+          msg = "Popup diblokir browser. Izinkan popup untuk situs ini.";
         }
         alert(msg);
       });
@@ -324,11 +332,8 @@
     const vowels = "aeiou";
     let pass = "";
     for (let i = 0; i < 9; i++) {
-      if (i % 2 === 0) {
-        pass += consonants.charAt(Math.floor(Math.random() * consonants.length));
-      } else {
-        pass += vowels.charAt(Math.floor(Math.random() * vowels.length));
-      }
+      if (i % 2 === 0) pass += consonants.charAt(Math.floor(Math.random() * consonants.length));
+      else pass += vowels.charAt(Math.floor(Math.random() * vowels.length));
     }
     document.getElementById('password').value = pass;
   }
@@ -349,6 +354,8 @@
         if (item.status === 'Sale') statusClass = 'status-sale';
         if (item.status === 'Sold') statusClass = 'status-sold';
         if (item.status === 'Kendala') statusClass = 'status-kendala';
+        if (item.status === 'WIP') statusClass = 'status-wip';
+        if (item.status === 'Ready') statusClass = 'status-ready';
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
